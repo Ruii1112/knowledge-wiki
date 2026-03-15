@@ -1,0 +1,101 @@
+plugins {
+    id 'org.springframework.boot' version '4.0.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.jooq.jooq-codegen-gradle' version '3.19.30'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-jooq'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    jooqCodegen 'org.jooq:jooq-meta-extensions:3.19.30'
+}
+
+// jOOQ code generation from migration SQL (DDLDatabase - no live DB required)
+jooq {
+    configuration {
+        generator {
+            database {
+                name = 'org.jooq.meta.extensions.ddl.DDLDatabase'
+                properties {
+                    property {
+                        key = 'scripts'
+                        value = file("${projectDir}/../migration/sql").canonicalPath + '/V*.sql'
+                    }
+                    property {
+                        key = 'sort'
+                        value = 'flyway'
+                    }
+                    property {
+                        key = 'defaultNameCase'
+                        value = 'lower'
+                    }
+                    property {
+                        key = 'unqualifiedSchema'
+                        value = 'none'
+                    }
+                }
+                includes = '.*'
+                excludes = 'flyway_schema_history'
+            }
+            generate {
+                records = true
+                fluentSetters = true
+                javaTimeTypes = true
+            }
+            target {
+                packageName = 'com.example.knowledge.jooq'
+                directory = "${projectDir}/src/generated/jooq"
+            }
+        }
+    }
+}
+
+tasks.named('jooqCodegen') {
+    inputs.files(fileTree("${projectDir}/../migration/sql"))
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "${projectDir}/src/generated/jooq"
+        }
+    }
+}
+
+tasks.named('compileJava') {
+    dependsOn 'jooqCodegen'
+}
+
+tasks.register('copyOpenApiSpec', Copy) {
+    description = 'Copy OpenAPI spec from docs to static resources'
+    from "${projectDir}/../docs/api/openapi.yaml"
+    into "${layout.buildDirectory.get()}/resources/main/static/api-docs"
+}
+
+tasks.named('processResources') {
+    dependsOn 'copyOpenApiSpec'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

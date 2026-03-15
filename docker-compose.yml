@@ -1,0 +1,62 @@
+services:
+  db:
+    image: mysql:9.6
+    container_name: knowledge-db
+    environment:
+      MYSQL_DATABASE: knowledge
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: app
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migration:
+    build:
+      context: ./migration
+    container_name: knowledge-migration
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:mysql://db:3306/knowledge?allowPublicKeyRetrieval=true&useSSL=false
+      FLYWAY_USER: app
+      FLYWAY_PASSWORD: secret
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql
+    command: ["migrate"]
+
+  backend:
+    build:
+      context: ./backend
+    container_name: knowledge-backend
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/knowledge
+      SPRING_DATASOURCE_USERNAME: app
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: knowledge-frontend
+    depends_on:
+      - backend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "5173:5173"
+
+volumes:
+  db-data:
