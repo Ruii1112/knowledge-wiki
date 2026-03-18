@@ -21,8 +21,8 @@ Accepted
 
 |レイヤー|技術|
 |---|---|
-|Frontend|React 19.2 / TypeScript 5.9 / Vite 8|
-|Backend|Java 25 LTS / Spring Boot 4.0.3 / Spring Data JPA 4.0.4|
+|Frontend|React 19 / TypeScript 5.9 / Vite 8|
+|Backend|Java 25 LTS / Spring Boot 4.0.3 / JOOQ 3.19|
 |Authentication|Spring Security 7 + JWT (HS256)|
 |Database|MySQL Community 9.6|
 |Migration|Flyway 12.1|

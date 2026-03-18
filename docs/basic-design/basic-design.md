@@ -26,11 +26,11 @@ controllerは入出力を受け持ち、usecaseでドメインロジックをま
 ### 1.2 技術スタック
 |項目|技術|
 |---|---|
-|フロントエンド|React 19.2.4 / TypeScript 5.9.3 / Vite 8.0.0|
-|バックエンド|Java 25.0.2 (LTS) / Spring Boot 4.0.3 / jOOQ 3.19|
-|認証|Spring Security 7.0.3 + JWT|
-|データベース|MySQL 9.6.0|
-|マイグレーション|Flyway 12.1.0|
+|フロントエンド|React 19 / TypeScript 5.9 / Vite 8|
+|バックエンド|Java 25 (LTS) / Spring Boot 4.0.3 / jOOQ 3.19|
+|認証|Spring Security 7 + JWT|
+|データベース|MySQL 9.6.|
+|マイグレーション|Flyway 12.1.|
 |API形式|REST + JSON|
 |API仕様管理|OpenAPI 3.1 (API First) + SpringDoc Swagger UI|
 
@@ -38,7 +38,7 @@ controllerは入出力を受け持ち、usecaseでドメインロジックをま
 
 ### 2.1 一般ユーザー動線
 ```
-ログイン
+ユーザー登録 → ログイン
   ↓
 記事一覧
   ↓
@@ -86,6 +86,7 @@ articles (n) ─── (n) tags   ※article_tagsで中間テーブル構成
 |email|VARCHAR(255)|一意|
 |password_hash|VARCHAR(255)|BCrypt|
 |role|VARCHAR(20)|`USER` / `ADMIN`|
+|enabled|BOOLEAN|有効状態（デフォルト`TRUE`）|
 |created_at|DATETIME|作成日時|
 
 #### articles
@@ -142,7 +143,10 @@ API仕様は`docs/api/openapi.yaml`で管理する（API First）。バックエ
 ### 4.2 認証API
 |機能|Method|Path|説明|
 |---|---|---|---|
+|ユーザー登録|POST|`/auth/signup`|新規ユーザーアカウントを作成|
 |ログイン|POST|`/auth/login`|ユーザー名とパスワードでJWTを発行|
+
+※ログアウトはクライアント側でJWTを破棄することで実現する（サーバー側エンドポイントなし）。
 
 Request
 ```json
@@ -162,7 +166,7 @@ Response
 ### 4.3 記事API
 |機能|Method|Path|説明|
 |---|---|---|---|
-|記事一覧|GET|`/articles`|ページング＋タグ条件検索|
+|記事一覧|GET|`/articles`|ページング＋キーワード・タグ条件検索|
 |記事詳細|GET|`/articles/{id}`|単一記事と最新コメント概要|
 |記事作成|POST|`/articles`|記事の新規登録（認証必須）|
 |記事更新|PUT|`/articles/{id}`|タイトル・本文・タグ編集|
@@ -209,6 +213,12 @@ Response
   "content": "参考になりました"
 }
 ```
+
+### 4.6 ユーザー管理API(管理者のみ)
+|機能|Method|Path|説明|
+|---|---|---|---|
+|ユーザー一覧|GET|`/admin/users`|管理者がユーザー一覧を取得|
+|ユーザー情報更新|PATCH|`/admin/users/{userId}`|ロールや有効状態を変更|
 
 ## 5. 認証フロー
 1. ユーザーが`POST /auth/login`に資格情報を送信。

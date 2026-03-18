@@ -23,7 +23,7 @@ MySQL 9.6 + Flyway
 
 - フロントエンドはSPAとして画面遷移をクライアント側で完結。
 - APIはSpring Boot 4.0で実装し、`controller`（入出力）→`usecase`（アプリケーションロジック）→`repository/infrastructure`（データアクセス）で責務を分離、`model/dto`は共有コンテキストとして利用、`config/security`で横断的関心事を管理。
-- データアクセスはSpring Data JPA、スキーマ管理はFlywayで行う。
+- データアクセスはJOOQ、スキーマ管理はFlywayで行う。
 
 ## Consequences
 

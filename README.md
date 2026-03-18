@@ -7,7 +7,7 @@
 | レイヤー | 技術 |
 |---|---|
 | Frontend | React 19 / TypeScript 5.9 / Vite 8 |
-| Backend | Java 25 / Spring Boot 4.0.3 / Spring Data JPA |
+| Backend | Java 25 / Spring Boot 4.0.3 / JOOQ 3.19 |
 | Auth | Spring Security 7 + JWT (HS256) |
 | DB | MySQL 9.6 |
 | Migration | Flyway 12.1 |

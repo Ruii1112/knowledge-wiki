@@ -16,7 +16,7 @@ Accepted
 |---|---|---|
 |users|アカウント|`username` unique, `email` unique|
 |articles|記事本体|`author_id`, `created_at`, `title`(FULLTEXT予定)|
-|article_histories|記事履歴|`article_id`, `version` unique|
+|article_histories|記事履歴|`article_id`, `version` unique（複合）|
 |comments|コメント|`article_id`, `created_at`|
 |tags|タグマスタ|`name` unique|
 |article_tags|記事とタグの多対多|`article_id`, `tag_id` (複合PK)|
