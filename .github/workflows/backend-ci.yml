@@ -1,0 +1,91 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'backend/**'
+      - 'migration/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'backend/**'
+      - 'migration/**'
+      - '.github/workflows/backend-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:9.6
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: knowledge
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        ports:
+          - 3306:3306
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: 25
+          distribution: temurin
+          cache: gradle
+
+      - name: Run Flyway migrations
+        run: |
+          cd backend
+          ./gradlew flywayMigrate -Dflyway.url=jdbc:mysql://localhost:3306/knowledge -Dflyway.user=root -Dflyway.password=root
+
+      - name: Generate jOOQ code
+        run: |
+          cd backend
+          ./gradlew jooqCodegen
+
+      - name: Build with Gradle
+        run: |
+          cd backend
+          ./gradlew clean build
+
+      - name: Run tests
+        run: |
+          cd backend
+          ./gradlew test
+
+  checkstyle:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: 25
+          distribution: temurin
+          cache: gradle
+
+      - name: Check code style
+        run: |
+          cd backend
+          ./gradlew checkstyleMain
+
+      - name: Format check with Spotless
+        run: |
+          cd backend
+          ./gradlew spotlessCheck
