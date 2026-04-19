@@ -22,7 +22,7 @@ export const authService = {
       try {
         const errorData = (await response.json()) as ErrorResponse;
         errorMessage = errorData.message || errorMessage;
-      } catch (e) {
+      } catch {
         // JSON parse error, use default message
       }
 

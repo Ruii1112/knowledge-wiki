@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { RegistrationPage } from './pages/Registration';
 import './styles/globals.css';
