@@ -1,8 +1,8 @@
-package com.example.knowledge.controller;
+package com.example.knowledge.presentation.controller;
 
-import com.example.knowledge.dto.SignupRequest;
-import com.example.knowledge.dto.UserResponse;
-import com.example.knowledge.usecase.AuthSignupUsecase;
+import com.example.knowledge.api.dto.SignupRequest;
+import com.example.knowledge.api.dto.UserResponse;
+import com.example.knowledge.application.usecase.AuthSignupUsecase;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

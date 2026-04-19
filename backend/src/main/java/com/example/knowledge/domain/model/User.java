@@ -1,4 +1,4 @@
-package com.example.knowledge.model;
+package com.example.knowledge.domain.model;
 
 import java.time.LocalDateTime;
 

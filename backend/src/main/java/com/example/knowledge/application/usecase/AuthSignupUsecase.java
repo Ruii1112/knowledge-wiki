@@ -1,9 +1,9 @@
-package com.example.knowledge.usecase;
+package com.example.knowledge.application.usecase;
 
-import com.example.knowledge.dto.SignupRequest;
-import com.example.knowledge.dto.UserResponse;
-import com.example.knowledge.model.User;
-import com.example.knowledge.repository.UserRepository;
+import com.example.knowledge.api.dto.SignupRequest;
+import com.example.knowledge.api.dto.UserResponse;
+import com.example.knowledge.domain.model.User;
+import com.example.knowledge.infrastructure.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package com.example.knowledge.dto;
+package com.example.knowledge.api.dto;
 
 import java.time.LocalDateTime;
 
