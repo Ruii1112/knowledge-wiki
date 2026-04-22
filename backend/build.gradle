@@ -1,6 +1,5 @@
 plugins {
     id 'org.springframework.boot' version '4.0.3'
-    id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
     id 'org.jooq.jooq-codegen-gradle' version '3.19.30'
 }
@@ -19,13 +18,17 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-jooq'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
     runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // --- test ---
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 
     jooqCodegen 'org.jooq:jooq-meta-extensions:3.19.30'
 }
@@ -64,7 +67,7 @@ jooq {
             }
             target {
                 packageName = 'com.example.knowledge.jooq'
-                directory = "${projectDir}/src/generated/jooq"
+                directory = "${buildDir}/generated/jooq"
             }
         }
     }
@@ -77,7 +80,7 @@ tasks.named('jooqCodegen') {
 sourceSets {
     main {
         java {
-            srcDir "${projectDir}/src/generated/jooq"
+            srcDir "${buildDir}/src/generated/jooq"
         }
     }
 }

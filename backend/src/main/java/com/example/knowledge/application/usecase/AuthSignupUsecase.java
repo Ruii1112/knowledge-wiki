@@ -2,10 +2,13 @@ package com.example.knowledge.application.usecase;
 
 import com.example.knowledge.api.dto.SignupRequest;
 import com.example.knowledge.api.dto.UserResponse;
+import com.example.knowledge.domain.exception.UserAlreadyExistsException;
 import com.example.knowledge.domain.model.User;
 import com.example.knowledge.infrastructure.repository.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthSignupUsecase {
@@ -18,38 +21,38 @@ public class AuthSignupUsecase {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public UserResponse execute(SignupRequest request) {
-        // Check if username already exists
-        if (userRepository.findByUsername(request.username()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists");
-        }
 
-        // Check if email already exists
-        if (userRepository.findByEmail(request.email()).isPresent()) {
-            throw new IllegalArgumentException("Email already exists");
-        }
+        String email = request.email().toLowerCase().trim();
 
-        // Hash password and create user
         String hashedPassword = passwordEncoder.encode(request.password());
+
         User user = new User(
                 null,
                 request.username(),
-                request.email(),
+                email,
                 hashedPassword,
                 "USER",
                 true,
                 null
         );
 
-        User savedUser = userRepository.save(user);
+        try {
+            User savedUser = userRepository.save(user);
 
-        return new UserResponse(
-                savedUser.id(),
-                savedUser.username(),
-                savedUser.email(),
-                savedUser.role(),
-                savedUser.enabled(),
-                savedUser.createdAt()
-        );
+            return new UserResponse(
+                    savedUser.id(),
+                    savedUser.username(),
+                    savedUser.email(),
+                    savedUser.role(),
+                    savedUser.enabled(),
+                    savedUser.createdAt()
+            );
+
+        } catch (DataIntegrityViolationException e) {
+            // TODO: 本当はconstraint名で分岐
+            throw new UserAlreadyExistsException("email");
+        }
     }
 }

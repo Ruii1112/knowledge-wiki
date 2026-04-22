@@ -3,6 +3,7 @@ package com.example.knowledge.presentation.controller;
 import com.example.knowledge.api.dto.SignupRequest;
 import com.example.knowledge.api.dto.UserResponse;
 import com.example.knowledge.application.usecase.AuthSignupUsecase;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,14 +22,10 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponse> signup(@RequestBody SignupRequest request) {
-        try {
-            UserResponse response = authSignupUsecase.execute(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public ResponseEntity<UserResponse> signup(
+            @Valid @RequestBody SignupRequest request
+    ) {
+        UserResponse response = authSignupUsecase.execute(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

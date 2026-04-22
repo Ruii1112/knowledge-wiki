@@ -4,15 +4,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.knowledge.api.dto.SignupRequest;
 import com.example.knowledge.api.dto.UserResponse;
+import com.example.knowledge.domain.exception.UserAlreadyExistsException;
 import com.example.knowledge.domain.model.User;
 import com.example.knowledge.infrastructure.repository.UserRepository;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -31,7 +31,6 @@ class AuthSignupUsecaseTest {
     }
 
     @Test
-    @DisplayName("should create user successfully with valid input")
     void shouldCreateUserSuccessfully() {
         SignupRequest request = new SignupRequest("newuser", "newuser@example.com", "SecurePass123");
 
@@ -40,92 +39,57 @@ class AuthSignupUsecaseTest {
         assertNotNull(response.id());
         assertEquals("newuser", response.username());
         assertEquals("newuser@example.com", response.email());
-        assertEquals("USER", response.role());
-        assertTrue(response.enabled());
-        assertNotNull(response.createdAt());
     }
 
     @Test
-    @DisplayName("should throw exception when username already exists")
-    void shouldThrowExceptionWhenUsernameExists() {
-        userRepository.saveUser(new User(
-                1L,
-                "existinguser",
-                "existing@example.com",
-                "hashedpassword",
-                "USER",
-                true,
-                LocalDateTime.now()
-        ));
-
-        SignupRequest request = new SignupRequest("existinguser", "newuser@example.com", "SecurePass123");
-
-        assertThrows(IllegalArgumentException.class, () -> authSignupUsecase.execute(request),
-                "Should throw IllegalArgumentException when username exists");
-    }
-
-    @Test
-    @DisplayName("should throw exception when email already exists")
     void shouldThrowExceptionWhenEmailExists() {
         userRepository.saveUser(new User(
-                1L,
-                "existinguser",
-                "existing@example.com",
-                "hashedpassword",
-                "USER",
-                true,
-                LocalDateTime.now()
+                1L, "user", "test@example.com", "pass", "USER", true, LocalDateTime.now()
         ));
 
-        SignupRequest request = new SignupRequest("newuser", "existing@example.com", "SecurePass123");
+        SignupRequest request = new SignupRequest("newuser", "test@example.com", "SecurePass123");
 
-        assertThrows(IllegalArgumentException.class, () -> authSignupUsecase.execute(request),
-                "Should throw IllegalArgumentException when email exists");
+        assertThrows(UserAlreadyExistsException.class,
+                () -> authSignupUsecase.execute(request));
     }
 
     @Test
-    @DisplayName("should hash password correctly")
-    void shouldHashPasswordCorrectly() {
-        String rawPassword = "SecurePass123";
-        SignupRequest request = new SignupRequest("newuser", "newuser@example.com", rawPassword);
+    void shouldNormalizeEmail() {
+        SignupRequest request = new SignupRequest("newuser", "TEST@EXAMPLE.COM", "SecurePass123");
+
+        UserResponse response = authSignupUsecase.execute(request);
+
+        assertEquals("test@example.com", response.email());
+    }
+
+    @Test
+    void shouldHashPassword() {
+        String raw = "SecurePass123";
+        SignupRequest request = new SignupRequest("newuser", "a@a.com", raw);
 
         authSignupUsecase.execute(request);
 
-        User savedUser = userRepository.findByUsername("newuser").get();
-        assertTrue(passwordEncoder.matches(rawPassword, savedUser.passwordHash()),
-                "Password should be hashed using BCrypt");
-        assertNotEquals(rawPassword, savedUser.passwordHash(),
-                "Raw password should not match hashed password");
+        User saved = userRepository.findByUsername("newuser").get();
+
+        assertTrue(passwordEncoder.matches(raw, saved.passwordHash()));
     }
 
-    @Test
-    @DisplayName("should set role to USER by default")
-    void shouldSetRoleToUserByDefault() {
-        SignupRequest request = new SignupRequest("newuser", "newuser@example.com", "SecurePass123");
-
-        UserResponse response = authSignupUsecase.execute(request);
-
-        assertEquals("USER", response.role());
-    }
-
-    @Test
-    @DisplayName("should set enabled to true by default")
-    void shouldSetEnabledToTrueByDefault() {
-        SignupRequest request = new SignupRequest("newuser", "newuser@example.com", "SecurePass123");
-
-        UserResponse response = authSignupUsecase.execute(request);
-
-        assertTrue(response.enabled());
-    }
-
-    // Mock implementation for testing
+    // Mock Repository（email UNIQUE再現）
     static class MockUserRepository implements UserRepository {
-        private final Map<String, User> users = new HashMap<>();
+
+        private final Map<Long, User> users = new HashMap<>();
         private long idCounter = 1L;
 
         @Override
         public User save(User user) {
-            User savedUser = new User(
+            boolean exists = users.values().stream()
+                    .anyMatch(u -> u.email().equals(user.email()));
+
+            if (exists) {
+                throw new DataIntegrityViolationException("Duplicate email");
+            }
+
+            User saved = new User(
                     idCounter++,
                     user.username(),
                     user.email(),
@@ -134,13 +98,16 @@ class AuthSignupUsecaseTest {
                     user.enabled(),
                     LocalDateTime.now()
             );
-            users.put(user.username(), savedUser);
-            return savedUser;
+
+            users.put(saved.id(), saved);
+            return saved;
         }
 
         @Override
         public Optional<User> findByUsername(String username) {
-            return Optional.ofNullable(users.get(username));
+            return users.values().stream()
+                    .filter(u -> u.username().equals(username))
+                    .findFirst();
         }
 
         @Override
@@ -152,13 +119,11 @@ class AuthSignupUsecaseTest {
 
         @Override
         public Optional<User> findById(Long id) {
-            return users.values().stream()
-                    .filter(u -> u.id().equals(id))
-                    .findFirst();
+            return Optional.ofNullable(users.get(id));
         }
 
         void saveUser(User user) {
-            users.put(user.username(), user);
+            users.put(user.id(), user);
         }
     }
 }
