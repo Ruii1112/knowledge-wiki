@@ -3,7 +3,8 @@ FROM eclipse-temurin:25-jdk
 
 WORKDIR /app
 
-COPY . /app
+COPY backend /app
+COPY migration /migration
 
 RUN chmod +x ./gradlew
 
