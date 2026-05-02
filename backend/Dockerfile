@@ -3,10 +3,14 @@ FROM eclipse-temurin:25-jdk
 
 WORKDIR /app
 
-COPY backend /app
-COPY migration /migration
+COPY backend /app/backend
+COPY migration /app/migration
 
+WORKDIR /app/backend
+
+RUN sed -i 's/\r$//' ./gradlew
 RUN chmod +x ./gradlew
+
 
 EXPOSE 8080
 
