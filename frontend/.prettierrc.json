@@ -1,10 +1,11 @@
 {
   "semi": true,
-  "trailingComma": "es5",
+  "trailingComma": "all",
   "singleQuote": true,
   "printWidth": 100,
   "tabWidth": 2,
   "useTabs": false,
   "arrowParens": "always",
-  "endOfLine": "lf"
+  "endOfLine": "lf",
+  "overrides": [{ "files": "*.md", "options": { "printWidth": 80 } }]
 }

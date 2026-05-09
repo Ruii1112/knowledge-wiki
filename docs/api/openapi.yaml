@@ -34,6 +34,21 @@ paths:
         "401":
           description: 認証失敗
 
+  /auth/me:
+    get:
+      tags: [認証]
+      summary: 現在のユーザー情報取得
+      description: 保持しているJWTから現在のユーザー情報を取得する
+      responses:
+        "200":
+          description: ユーザー情報
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "401":
+          description: 未認証またはトークン失効
+
   /auth/signup:
     post:
       tags: [認証]
@@ -387,7 +402,7 @@ components:
         tags:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Tag"
           example: [spring, backend]
         createdAt:
           type: string
@@ -412,7 +427,7 @@ components:
         tags:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Tag"
         createdAt:
           type: string
           format: date-time
@@ -433,8 +448,14 @@ components:
         tags:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Tag"
           example: [spring, security]
+
+    Tag:
+      type: string
+      minLength: 1
+      maxLength: 100
+      description: タグ名 (DB tags.name VARCHAR(100) と同期)
 
     ArticleUpdateRequest:
       type: object
@@ -446,7 +467,7 @@ components:
         tags:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Tag"
 
     HistorySummary:
       type: object

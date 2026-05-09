@@ -1,0 +1,41 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.globalError {
+  padding: 1rem;
+  background-color: rgba(var(--error-color-rgb), 0.1);
+  border: 1px solid var(--error-color);
+  border-radius: 0.5rem;
+  color: var(--error-color);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.registerLink {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+
+  a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+
+    &:hover {
+      color: var(--accent-color-hover);
+      text-decoration: underline;
+    }
+
+    &:focus {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+  }
+}

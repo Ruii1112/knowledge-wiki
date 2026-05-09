@@ -1,0 +1,89 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  color: #111827;
+}
+
+.backLink {
+  padding: 0.4rem 0.85rem;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #1f2937;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.status {
+  padding: 2rem 0;
+  text-align: center;
+  color: #6b7280;
+}
+
+.error {
+  padding: 1rem;
+  background: #fef2f2;
+  color: #b91c1c;
+  border-radius: 6px;
+  border: 1px solid #fecaca;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 0.9rem;
+}
+
+.th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #374151;
+}
+
+.row:not(:last-child) .td,
+.row:not(:last-child) .tdAction {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.td {
+  padding: 0.75rem 1rem;
+  color: #1f2937;
+}
+
+.tdAction {
+  padding: 0.5rem 1rem;
+  text-align: right;
+}
+
+.detailLink {
+  padding: 0.3rem 0.7rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+
+.detailLink:hover {
+  background: #dbeafe;
+}

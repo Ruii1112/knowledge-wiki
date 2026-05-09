@@ -1,36 +1,24 @@
-import { beforeAll, afterEach, afterAll, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 import { setupServer } from 'msw/node';
-import { http, HttpResponse } from 'msw';
+import { afterAll, afterEach, beforeAll, vi } from 'vitest';
+import { resetDb } from '../lib/mocks/db';
+import { handlers } from '../lib/mocks/handlers';
 
-const API_BASE_URL = 'http://localhost:8080/api';
-
-// Mock API handlers
-export const handlers = [
-  http.post(`${API_BASE_URL}/auth/signup`, async () => {
-    return HttpResponse.json(
-      {
-        id: 1,
-        username: 'testuser',
-        email: 'test@example.com',
-        role: 'USER',
-        enabled: true,
-        createdAt: new Date().toISOString(),
-      },
-      { status: 201 }
-    );
-  }),
-];
-
+// テストでは本番と同じ MSW handlers を流用 (重複定義を排除)
 export const server = setupServer(...handlers);
 
-beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+afterEach(() => {
+  server.resetHandlers();
+  // mutable な mock db を初期 fixture に戻す (テスト間の汚染防止)
+  resetDb();
+  localStorage.clear();
+});
 afterAll(() => server.close());
 
-// Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation((query) => ({
+  value: vi.fn().mockImplementation((query: string) => ({
     matches: false,
     media: query,
     onchange: null,
