@@ -1,0 +1,15 @@
+#!/bin/sh
+# pre-commit: frontend を変更している場合のみ format + lint チェック
+# hook 自身や CI ワークフロー変更時にも frontend ゲートを当てたいので grep に含める
+cd "$(dirname "$0")/.."
+
+CHANGED=$(git diff --cached --name-only --diff-filter=ACMR \
+  | grep -E '^(frontend/.+\.(ts|tsx|css|json|md)|\.husky/.+|\.github/workflows/frontend-ci\.yml)$' \
+  || true)
+
+if [ -z "$CHANGED" ]; then
+  exit 0
+fi
+
+cd frontend
+npx lint-staged

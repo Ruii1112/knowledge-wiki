@@ -1,0 +1,43 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.status {
+  padding: 2rem 0;
+  text-align: center;
+  color: #6b7280;
+}
+
+.error {
+  padding: 1rem;
+  background: #fef2f2;
+  color: #b91c1c;
+  border-radius: 6px;
+  border: 1px solid #fecaca;
+}
+
+.backLink {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.4rem 0.85rem;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #1f2937;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}

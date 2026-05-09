@@ -4,7 +4,8 @@ backend/.gradle/
 .gradle/
 
 # Node
-frontend/node_modules/
+node_modules/
+frontend/dist/
 
 # Environment
 .env
