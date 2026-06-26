@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: knowledge-backend
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
+      - org.springframework.boot.jdbc.autoconfigure.health.DataSourceHealthContributorAutoConfiguration
+      - org.springframework.boot.jooq.autoconfigure.JooqAutoConfiguration
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,swagger-ui
+
+springdoc:
+  swagger-ui:
+    url: /api-docs/openapi.yaml
+    path: /actuator/swagger-ui

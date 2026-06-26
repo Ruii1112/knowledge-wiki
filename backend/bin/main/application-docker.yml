@@ -1,0 +1,7 @@
+spring:
+  autoconfigure:
+    exclude: []
+  datasource:
+    url: jdbc:mysql://${DB_HOST:db}:${DB_PORT:3306}/${DB_NAME:knowledge}
+    username: ${DB_USER:app}
+    password: ${DB_PASSWORD:secret}
